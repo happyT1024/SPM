@@ -2,4 +2,12 @@
 
 #include <config/Gate.h>
 
-class Config{};
+#include <vector>
+
+class Config{
+public:
+  using Gates = std::vector<Gate>;
+
+  Gates m_internalGates;
+  Gate m_externalGate;
+};
