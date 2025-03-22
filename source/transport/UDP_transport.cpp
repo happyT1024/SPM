@@ -16,7 +16,7 @@ void UDP_transport::Proceed() {
   }
 
   epoll_event events[MAX_EVENTS];
-  int nfds = epoll_wait(m_epollfd, events, MAX_EVENTS, 100);
+  int nfds = epoll_wait(m_epollfd, events, MAX_EVENTS, 1000);
   for (int n = 0; n < nfds; ++n) {
     if (events[n].events & EPOLLIN) {
       char buf[1024];
@@ -94,6 +94,4 @@ void UDP_transport::init() {
   }
   m_externalAddr = gateToAddr(m_config.m_externalGate);
   m_externalSock = getSock();
-  bindSock(m_externalSock, m_externalAddr);
-  addToEpoll(m_externalSock);
 }
