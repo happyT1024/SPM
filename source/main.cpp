@@ -8,12 +8,7 @@ int main() {
   try {
     while (true) {
       udp_transport.Proceed();
-      if (!udp_transport.internalPackets.empty()) {
-        std::swap(udp_transport.internalPackets, udp_transport.externalPackets);
-      }
-      else {
-        sleep(1);
-      }
+      std::swap(udp_transport.internalPackets, udp_transport.externalPackets);
     }
   } catch (...) {
     std::cout << "Error: " << std::endl;

@@ -10,6 +10,9 @@
 #include <queue>
 #include <utility>
 #include <sys/socket.h>
+#include <sys/epoll.h>
+
+#define MAX_EVENTS 10
 
 class UDP_transport {
 public:
@@ -33,20 +36,21 @@ public:
       std::cout << "Отправлено сообщение: " << externalPackets.front() << std::endl;
       externalPackets.pop();
     }
-    // TODO: epoll
-    for (int i = 0; i < m_internalSocks.size(); ++i) {
-      auto &sock = m_internalSocks[i];
-      auto &addr = m_internalAddrs[i];
-      char buff[1000];
-      socklen_t addrlen = sizeof(addr);
-      int nbytes = recvfrom(sock, buff, 1000, 0,
-                            reinterpret_cast<sockaddr *>(&addr), &addrlen);
-      if (nbytes == -1) {
-        perror("Ошибка при получении данных");
+
+    epoll_event events[MAX_EVENTS];
+    int nfds = epoll_wait(m_epollfd, events, MAX_EVENTS, 100);
+    for (int n = 0; n < nfds; ++n) {
+      if (events[n].events & EPOLLIN) {
+        char buf[1024];
+        ssize_t count = read(events[n].data.fd, buf, sizeof(buf));
+        if (count == -1) {
+          perror("read");
+        } else if (count > 0) {
+          printf("Read %zd bytes: %.*s\n", count, (int)count, buf);
+        }
+        std::string packet(buf, count);
+        internalPackets.push(packet);
       }
-      std::string packet(buff, nbytes);
-      std::cout << "Получено сообщение: " << packet << std::endl;
-      internalPackets.push(packet);
     }
   }
 
@@ -55,6 +59,7 @@ public:
     for (auto &sock : m_internalSocks) {
       close(sock);
     }
+    close(m_epollfd);
   }
 
   SIPPackets internalPackets;
@@ -87,18 +92,40 @@ private:
       }
     };
 
-    m_internalSocks.resize(m_config.m_internalGates.size());
+    const auto& addToEpoll = [this](int sock) {
+      epoll_event ev{};
+      ev.events = EPOLLIN;
+      ev.data.fd = sock;
+      if (epoll_ctl(m_epollfd, EPOLL_CTL_ADD, sock, &ev) == -1) {
+        perror("epoll_ctl: sock");
+        exit(EXIT_FAILURE);
+      }
+    };
+
+    const auto pollSize = static_cast<int>(m_config.m_internalGates.size());
+
+    m_internalSocks.resize(pollSize);
+    m_epollfd = epoll_create(pollSize);
+
+    if (m_epollfd == -1) {
+      perror("epoll_create");
+      exit(EXIT_FAILURE);
+    }
+
     for (int i = 0; i < m_config.m_internalGates.size(); ++i) {
       m_internalAddrs.emplace_back(gateToAddr(m_config.m_internalGates[i]));
       m_internalSocks[i] = getSock();
       bindSock(m_internalSocks[i], m_internalAddrs[i]);
+      addToEpoll(m_internalSocks[i]);
     }
     m_externalAddr = gateToAddr(m_config.m_externalGate);
     m_externalSock = getSock();
     bindSock(m_externalSock, m_externalAddr);
+    addToEpoll(m_externalSock);
   }
 
 private:
+  // TODO: хз зачем хранить конфигу полностью, потом выпилить или создать возможность перезагрузить конфиг
   Config m_config;
 
   int m_externalSock{};
@@ -106,4 +133,6 @@ private:
 
   sockaddr_in m_externalAddr{};
   std::vector<sockaddr_in> m_internalAddrs;
+
+  int m_epollfd;
 };
