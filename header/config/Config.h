@@ -4,16 +4,19 @@
 
 #include <vector>
 
-class Config{
+class Config {
 public:
   using Gates = std::vector<Gate>;
+
 public:
   Config() = delete;
-
-  Config(Gates internalGates, const Gate& externalGate)
-      : m_internalGates(std::move(internalGates))
-        , m_externalGate(externalGate)
-  {}
+  Config(Gates internalGates, Gate externalGate)
+      : m_internalGates(std::move(internalGates)),
+        m_externalGate(std::move(externalGate)) {}
+  Config(const Config &other) = default;
+  Config &operator=(const Config &other) = default;
+  Config(Config &&other) = default;
+  Config &operator=(Config &&other) = default;
 
   Gates m_internalGates;
   Gate m_externalGate;
