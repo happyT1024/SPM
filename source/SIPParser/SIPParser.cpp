@@ -2,20 +2,20 @@
 
 void SIPParser::Proceed()
 {
-  if(m_internalMessages.empty())
-    return;
-  auto str = m_internalMessages.front();
-  auto strMsg = str.c_str();
-  m_internalMessages.pop();
-  auto len = strlen(strMsg);
-  msg_t* msg = parse_memory(mclass, strMsg, len);
-  sip_t* sip = sip_object(msg);
-  if (!sip) {
-    printf("Неверный SIP-пакет!\n");
-    m_invalidMessages.emplace(strMsg);
-    return;
+  while(!m_internalMessages.empty()) {
+    auto str = m_internalMessages.front();
+    auto strMsg = str.c_str();
+    m_internalMessages.pop();
+    auto len = strlen(strMsg);
+    msg_t *msg = parse_memory(mclass, strMsg, len);
+    sip_t *sip = sip_object(msg);
+    if (!sip) {
+      printf("Неверный SIP-пакет!\n");
+      m_invalidMessages.emplace(strMsg);
+      return;
+    }
+    m_unmodifiedMessages.emplace(sip);
   }
-  m_unmodifiedMessages.emplace(sip);
 }
 
 msg_t* SIPParser::parse_memory(msg_mclass_t const *mclass, char const data[], int len)

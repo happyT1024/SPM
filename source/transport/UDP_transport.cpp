@@ -27,7 +27,7 @@ void UDP_transport::Proceed() {
       if (count == -1) {
         perror("read");
       } else if (count > 0) {
-        printf("Read %zd bytes: %.*s\n", count, (int)count, buf);
+        //printf("Read %zd bytes: %.*s\n", count, (int)count, buf);
       }
       std::string packet(buf, count);
       m_internalPackets.push(packet);
