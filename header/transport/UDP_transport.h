@@ -21,14 +21,14 @@ public:
 public:
   UDP_transport() = delete;
 
-  explicit UDP_transport(Config config);
+  UDP_transport(Config config, SIPPackets& internalPackets, SIPPackets& externalPackets);
 
   void Proceed();
 
   ~UDP_transport();
 
-  SIPPackets internalPackets;
-  SIPPackets externalPackets;
+  SIPPackets& m_internalPackets;
+  SIPPackets& m_externalPackets;
 
 private:
   void init();

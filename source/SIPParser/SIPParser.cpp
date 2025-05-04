@@ -2,9 +2,12 @@
 
 void SIPParser::Proceed()
 {
-  auto strMsg = m_internalMessages.front().c_str();
+  if(m_internalMessages.empty())
+    return;
+  auto str = m_internalMessages.front();
+  auto strMsg = str.c_str();
   m_internalMessages.pop();
-  int len = static_cast<int>(strlen(strMsg));
+  auto len = strlen(strMsg);
   msg_t* msg = parse_memory(mclass, strMsg, len);
   sip_t* sip = sip_object(msg);
   if (!sip) {

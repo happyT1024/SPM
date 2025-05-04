@@ -1,18 +1,21 @@
 #include <transport/UDP_transport.h>
 
-UDP_transport::UDP_transport(Config config) : m_config(std::move(config)) {
+UDP_transport::UDP_transport(Config config, SIPPackets &internalPackets,
+                             SIPPackets &externalPackets)
+    : m_config(std::move(config)), m_internalPackets(internalPackets),
+      m_externalPackets(externalPackets) {
   init();
 }
 
 void UDP_transport::Proceed() {
-  while (!externalPackets.empty()) {
-    sendto(m_externalSock, externalPackets.front().c_str(),
-           externalPackets.front().length(), MSG_NOSIGNAL,
+  while (!m_externalPackets.empty()) {
+    sendto(m_externalSock, m_externalPackets.front().c_str(),
+           m_externalPackets.front().length(), MSG_NOSIGNAL,
            reinterpret_cast<const sockaddr *>(&m_externalAddr),
            sizeof(m_externalAddr));
-    std::cout << "Отправлено сообщение: " << externalPackets.front()
+    std::cout << "Отправлено сообщение: " << m_externalPackets.front()
               << std::endl;
-    externalPackets.pop();
+    m_externalPackets.pop();
   }
 
   epoll_event events[MAX_EVENTS];
@@ -27,7 +30,7 @@ void UDP_transport::Proceed() {
         printf("Read %zd bytes: %.*s\n", count, (int)count, buf);
       }
       std::string packet(buf, count);
-      internalPackets.push(packet);
+      m_internalPackets.push(packet);
     }
   }
 }
