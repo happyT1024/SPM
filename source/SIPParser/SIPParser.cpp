@@ -14,7 +14,7 @@ void SIPParser::Proceed()
       m_invalidMessages.emplace(strMsg);
       return;
     }
-    m_unmodifiedMessages.emplace(sip);
+    m_unmodifiedMessages.emplace(msg);
   }
 }
 

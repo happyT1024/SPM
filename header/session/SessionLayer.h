@@ -4,20 +4,40 @@
 
 #include <sofia-sip/sip.h>
 
+#include <utils/types.h>
+
 class SessionLayer{
 public:
   SessionLayer() = delete;
-  SessionLayer(std::queue<sip_t *> &unmodifiedMessages,
-               std::queue<sip_t *> &modifiedMessages)
-      : m_unmodifiedMessages(unmodifiedMessages),
-        m_modifiedMessages(modifiedMessages) {}
+  SessionLayer(SIPParsedMessages &modifiedMessages,
+               SIPStrMessages &externalMessages,
+               const Gate& externalGate)
+      : m_modifiedMessages(modifiedMessages),
+        m_externalMessages(externalMessages),
+        m_externalGate(externalGate){}
 
   void Proceed()
   {
-    std::swap(m_unmodifiedMessages, m_modifiedMessages);
+    while(!m_modifiedMessages.empty())
+    {
+      msg_t* msg = m_modifiedMessages.front();
+
+      // Буфер для хранения результата
+      //char buffer[4096];  // Достаточно большой для SIP-сообщения
+      // Сериализуем (mo = msg_pub_t*)
+      void ** buffer = NULL;
+      int bytes_read = msg_recv_buffer(msg, buffer);
+      msg_serialize;
+      // int len = msg_recv_buffer(msg, reinterpret_cast<void **>(buffer));
+      // m_externalMessages.emplace(buffer);
+      msg_destroy(msg);
+      std::cout<<bytes_read<<'\n';
+      m_modifiedMessages.pop();
+    }
   }
 
 private:
-  std::queue<sip_t*>& m_unmodifiedMessages;
-  std::queue<sip_t*>& m_modifiedMessages;
+  SIPParsedMessages& m_modifiedMessages;
+  SIPStrMessages& m_externalMessages;
+  Gate m_externalGate;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <config/Config.h>
+#include <utils/types.h>
 
 #include <arpa/inet.h>
 #include <bits/stdc++.h>
@@ -16,25 +17,18 @@
 
 class UDP_transport {
 public:
-  using SIPPackets = std::queue<std::string>;
-
-public:
   UDP_transport() = delete;
 
-  UDP_transport(Config config, SIPPackets& internalPackets, SIPPackets& externalPackets);
+  UDP_transport(Config config, SIPStrMessages& internalPackets, SIPStrMessages& externalPackets);
 
   void Proceed();
 
   ~UDP_transport();
 
-  SIPPackets& m_internalPackets;
-  SIPPackets& m_externalPackets;
-
 private:
   void init();
 
 private:
-  // TODO: хз зачем хранить конфигу полностью, потом выпилить или создать
   // возможность перезагрузить конфиг
   Config m_config;
 
@@ -45,4 +39,7 @@ private:
   std::vector<sockaddr_in> m_internalAddrs;
 
   int m_epollfd{};
+
+  SIPStrMessages& m_internalPackets;
+  SIPStrMessages& m_externalPackets;
 };

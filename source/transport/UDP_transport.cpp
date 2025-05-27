@@ -1,7 +1,7 @@
 #include <transport/UDP_transport.h>
 
-UDP_transport::UDP_transport(Config config, SIPPackets &internalPackets,
-                             SIPPackets &externalPackets)
+UDP_transport::UDP_transport(Config config, SIPStrMessages &internalPackets,
+                             SIPStrMessages &externalPackets)
     : m_config(std::move(config)), m_internalPackets(internalPackets),
       m_externalPackets(externalPackets) {
   init();
