@@ -3,7 +3,8 @@
 #include <queue>
 #include <string>
 
-#include <sofia-sip/sip.h>
+#include <SIPParser/SIP_Message.h>
+
 
 using SIPStrMessages = std::queue<std::string>;
-using SIPParsedMessages = std::queue<msg_t*>;
+using SIPParsedMessages = std::queue<Ds_SIP_Message>;

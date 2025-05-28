@@ -12,7 +12,7 @@ int main() {
   SIPParsedMessages unmodifiedMessages;
   SIPParsedMessages modifiedMessages;
 
-  Config config{{{"127.0.0.2", 5060}}, {"127.0.0.3", 5060}};
+  Config config{{{"127.0.0.2", 5061}}, {"127.0.0.3", 5062}};
 
   UDP_transport udp_transport(
       config,

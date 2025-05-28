@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include <sofia-sip/sip.h>
+//#include <sofia-sip/sip.h>
 
 #include <utils/types.h>
 
