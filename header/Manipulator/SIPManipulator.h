@@ -19,7 +19,7 @@ public:
     while(!m_unmodifiedMessages.empty())
     {
       auto& msg = m_unmodifiedMessages.front();
-      msg.from.name_address = "Matvey <sip:matveyCorrectURI@spbsut.com>";
+      msg.from.name_address.parse("Matvey <sip:matveyCorrectURI@spbsut.com>");
       m_modifiedMessages.push(msg);
       m_unmodifiedMessages.pop();
     }

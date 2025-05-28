@@ -15,16 +15,20 @@ TEST(SIP_Message_Parse,ParseFrom_test){
   Ds_SIP_Message::Ds_from from;
   from.parse(str);
   ASSERT_EQ(from.tag, "1928301774");
-  ASSERT_EQ(from.name_address, "Alice <sip:alice@example.com>");
+  ASSERT_EQ(from.name_address.to_str(), "Alice <sip:alice@example.com>");
+  ASSERT_EQ(from.name_address.display_name, "Alice");
+  ASSERT_EQ(from.name_address.uri, "<sip:alice@example.com>");
   ASSERT_EQ(from.to_str(), str+"\r\n");
 }
 
 TEST(SIP_Message_Parse,ParseTo_test){
-  std::string str = "To: Alice <sip:alice@example.com>;tag=1928301774";
+  std::string str = "To: Alice <sip:alice@example.com>";
   Ds_SIP_Message::Ds_to to;
   to.parse(str);
-  ASSERT_EQ(to.tag, "1928301774");
-  ASSERT_EQ(to.name_address, "Alice <sip:alice@example.com>");
+  ASSERT_EQ(to.tag, "");
+  ASSERT_EQ(to.name_address.to_str(), "Alice <sip:alice@example.com>");
+  ASSERT_EQ(to.name_address.display_name, "Alice");
+  ASSERT_EQ(to.name_address.uri, "<sip:alice@example.com>");
   ASSERT_EQ(to.to_str(), str+"\r\n");
 }
 
