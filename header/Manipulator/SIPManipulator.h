@@ -16,10 +16,20 @@ public:
 
   void Proceed()
   {
-    std::swap(m_unmodifiedMessages, m_modifiedMessages);
+    while(!m_unmodifiedMessages.empty())
+    {
+      auto& msg = m_unmodifiedMessages.front();
+      msg.from.name_address = "Matvey <sip:matveyCorrectURI@spbsut.com>";
+      m_modifiedMessages.push(msg);
+      m_unmodifiedMessages.pop();
+    }
   }
+
+  void LoadRule(const std::string& rule){}
 
 private:
   SIPParsedMessages& m_unmodifiedMessages;
   SIPParsedMessages& m_modifiedMessages;
+  std::string path;
+  std::string value;
 };

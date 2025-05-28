@@ -19,6 +19,15 @@ TEST(SIP_Message_Parse,ParseFrom_test){
   ASSERT_EQ(from.to_str(), str+"\r\n");
 }
 
+TEST(SIP_Message_Parse,ParseTo_test){
+  std::string str = "To: Alice <sip:alice@example.com>;tag=1928301774";
+  Ds_SIP_Message::Ds_to to;
+  to.parse(str);
+  ASSERT_EQ(to.tag, "1928301774");
+  ASSERT_EQ(to.name_address, "Alice <sip:alice@example.com>");
+  ASSERT_EQ(to.to_str(), str+"\r\n");
+}
+
 TEST(SIP_Message_Parse, ParseMsg_test)
 {
   std::string str =
@@ -37,8 +46,8 @@ TEST(SIP_Message_Parse, ParseMsg_test)
   ASSERT_EQ(sipMessage.begin, "INVITE sip:bob@example.com SIP/2.0\r\n"
                               "Via: SIP/2.0/UDP pc33.example.com;branch=z9hG4bK776asdhds\r\n");
   ASSERT_EQ(sipMessage.from.to_str(), "From: Alice <sip:alice@example.com>;tag=1928301774\r\n");
+  ASSERT_EQ(sipMessage.to.to_str(), "To: Bob <sip:bob@example.com>\r\n");
   ASSERT_EQ(sipMessage.end,
-                            "To: Bob <sip:bob@example.com>\r\n"
                             "Call-ID: a84b4c76e66710@pc33.example.com\r\n"
                             "Max-Forwards: 70\r\n"
                             "Contact: <sip:alice@pc33.example.com>\r\n"

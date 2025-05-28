@@ -6,13 +6,6 @@
 #include <string>
 #include <queue>
 
-//#include <sofia-sip/sip.h>
-//#include <sofia-sip/msg_parser.h>
-//#include <sofia-sip/msg.h>
-//#include <sofia-sip/su.h>
-//#include <sofia-sip/msg_addr.h>
-//#include <sofia-sip/sip_parser.h>
-
 #include <utils/types.h>
 
 class SIPParser{
